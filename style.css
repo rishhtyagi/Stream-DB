@@ -1,0 +1,63 @@
+input[type="text"],
+select {
+  width: 30%;
+  padding: 12px 20px;
+  margin: 10px 10px;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+input[type="button"] {
+  width: 100%;
+  background-color: #4caf50;
+  color: white;
+  padding: 14px 20px;
+  margin: 80px 0;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+input[type="button"]:hover {
+  background-color: #45a049;
+}
+div {
+  border-radius: 5px;
+  padding: 20px;
+}
+label {
+  font-size: 25px;
+}
+p {
+  font-size: 50px;
+  text-align: center;
+  background-color: #f2f2d3;
+}
+.bt {
+  background-color: #777;
+  color: white;
+  cursor: pointer;
+  padding: 10px;
+  width: 15%;
+  border: none;
+  text-align: center;
+  outline: none;
+  font-size: 20px;
+}
+
+.bt:hover {
+  background-color: #555;
+}
+
+form {
+  width: 300px;
+  margin: 0 auto;
+}
+hr.hrSeparator {
+  border-top: 1px dashed black;
+}
+.queryInput {
+  width: 100%;
+  flex: 1;
+}
