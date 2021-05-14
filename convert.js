@@ -1,4 +1,50 @@
-function downloadData(contentType, data, filename) {
+function appendStreams(contentType, data, filename) {
+  let dataparser = new DOMParser();
+  let dataxmlDOM = dataparser.parseFromString(data, "application/xml");
+  let datastreams = dataxmlDOM.querySelectorAll("stream");
+  var nodesToInsert = datastreams;
+  console.log(nodesToInsert);
+
+  let xmlContent = "";
+  fetch("export.xml", {}).then((response) => {
+    response.text().then((xml) => {
+      console.log("------");
+      xmlContent = xml;
+      let parser = new DOMParser();
+      let xmlDOM = parser.parseFromString(xmlContent, "application/xml");
+      let liststreams = xmlDOM.querySelectorAll("streams");
+      for (var i = 0; i < nodesToInsert.length; i++) {
+        liststreams[0].appendChild(nodesToInsert[i]);
+      }
+      // liststreams[0].appendChild(nodesToInsert[1]);
+      console.log(xmlDOM.getElementsByTagName("stream")[0]);
+      console.log(xmlDOM);
+
+      var xmlserialized = new XMLSerializer().serializeToString(
+        xmlDOM.documentElement
+      );
+      console.log(xmlserialized);
+
+      var fs = require("fs");
+
+      var link = document.createElement("A");
+      link.setAttribute(
+        "href",
+        encodeURI("data:" + contentType + "," + xmlserialized)
+      );
+      link.setAttribute("style", "display:none");
+      link.setAttribute("download", filename);
+      document.body.appendChild(link);
+      console.log(link.outerHTML);
+      link.click();
+      setTimeout(function () {
+        document.body.removeChild(link);
+      }, 1000);
+    });
+  });
+}
+
+function downloadStreams(contentType, data, filename) {
   var link = document.createElement("A");
   link.setAttribute("href", encodeURI("data:" + contentType + "," + data));
   link.setAttribute("style", "display:none");
@@ -148,5 +194,11 @@ function download(frm) {
   var data = fromToXml(frm);
   console.log(data);
 
-  downloadData("text/xml", data, "export.xml");
+  fetch("export.xml", {}).then((response) => {
+    if (response.statusText == "OK") {
+      appendStreams("text/xml", data, "export.xml");
+    } else {
+      downloadStreams("text/xml", data, "export.xml");
+    }
+  });
 }
