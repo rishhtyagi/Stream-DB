@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<streams>
+<stream>
+<streamname value="DM"></streamname>
+<streamsource value="/home/urg/IIITB/DM/esdproject/src/main/java/com/example/erp/controller/SAP_demo.csv"></streamsource>
+<window><windowsize value="5"></windowsize><windowvelocity value="2"></windowvelocity><windowtype value="Sliding Window"></windowtype></window>
+<properties><property><name value="Date"></name><type value="varchar(255)"></type></property><property><name value="Open"></name><type value="float"></type></property><property><name value="High"></name><type value="float"></type></property><property><name value="Low"></name><type value="float"></type></property><property><name value="Close"></name><type value="float"></type></property><property><name value="Adj_Close"></name><type value="float"></type></property><property><name value="Volume"></name><type value="int"></type></property></properties>
+<continous_queries><query value="select * from DM"></query></continous_queries>
+</stream>
+</streams>

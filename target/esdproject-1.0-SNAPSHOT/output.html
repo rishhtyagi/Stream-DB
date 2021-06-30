@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <link href="assets/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="assets/css/style.css" rel="stylesheet" />
+  </head>
+  <script>
+    let streaminfo = {};
+    window.onload = function () {
+      let xmlContent = "";
+      let streamselect = document.getElementById("streamSelect");
+      fetch("export.xml", {}).then((response) => {
+        response.text().then((xml) => {
+          console.log(xml);
+
+          xmlContent = xml;
+          let parser = new DOMParser();
+          let xmlDOM = parser.parseFromString(xmlContent, "application/xml");
+          let streams = xmlDOM.querySelectorAll("streamname");
+          let contqueries = xmlDOM.querySelectorAll("continous_queries");
+
+          let list = {};
+          for (var i = 0; i < streams.length; i++) {
+            list[streams[i].getAttribute("value")] = [];
+            for (var j = 0; j < contqueries[i].children.length; j++) {
+              list[streams[i].getAttribute("value")].push(
+                contqueries[i].children[j].getAttribute("value")
+              );
+            }
+          }
+          streaminfo = list;
+          streams.forEach((streamXmlNode) => {
+            console.log(streamXmlNode.getAttribute("value"));
+            var opt = document.createElement("option");
+            opt.value = streamXmlNode.getAttribute("value");
+            opt.innerHTML = streamXmlNode.getAttribute("value");
+            streamselect.appendChild(opt);
+          });
+        });
+      });
+    };
+
+    function getQueries() {
+      let queryselect = document.getElementById("querySelect");
+      queryselect.innerHTML = "";
+      var selectedStream = document.getElementById("streamSelect").value;
+      let querylist = streaminfo[selectedStream];
+
+      for (var i = 0; i < querylist.length; i++) {
+        var opt = document.createElement("option");
+        opt.value = querylist[i];
+        opt.innerHTML = querylist[i];
+        queryselect.appendChild(opt);
+      }
+    }
+
+    async function fetch_current_output() {
+      let response = await fetch('api/accounts/output', {
+        method: 'GET'
+      });
+      let result = await response.json();
+      console.log(result);
+      let outTable = document.getElementById("outputTable");
+      outTable.innerHTML = "";
+      let table = document.querySelector("table");
+      let query = document.getElementById('querySelect').value;
+      let stream = document.getElementById('streamSelect').value;
+      let data;
+      for(let t of result){
+        if (t["query_name"] === query  && t["stream_name"] === stream){
+          data = Object.keys(t);
+          break;
+        }
+      }
+
+      // let data = Object.keys(result[0]);
+
+      generateTableHead(table, data, result);
+    }
+
+    async function fetch_output() {
+
+      let response = await fetch('api/accounts/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json;charset=utf-8'
+        },
+        body: JSON.stringify({
+          stream: document.getElementById('streamSelect').value,
+          query: document.getElementById('querySelect').value
+        })
+      });
+      let outTable = document.getElementById("outputTable");
+      outTable.innerHTML = "";
+
+      //   let mountains = [
+      //     {
+      //       name: "Monte Falco",
+      //       height: 1658,
+      //       place: "Parco Foreste Casentinesi",
+      //     },
+      //     {
+      //       name: "Monte Falterona",
+      //       height: 1654,
+      //       place: "Parco Foreste Casentinesi",
+      //     },
+      //     {
+      //       name: "Poggio Scali",
+      //       height: 1520,
+      //       place: "Parco Foreste Casentinesi",
+      //     },
+      //     {
+      //       name: "Pratomagno",
+      //       height: 1592,
+      //       place: "Parco Foreste Casentinesi",
+      //     },
+      //     { name: "Monte Amiata", height: 1738, place: "Siena" },
+      //   ];
+      //
+
+      }
+      //
+      function generateTableHead(table, data, mountains) {
+        let query = document.getElementById('querySelect').value;
+        let stream = document.getElementById('streamSelect').value;
+
+        let thead = table.createTHead();
+        let row = thead.insertRow();
+        for (let key of data) {
+          let th = document.createElement("th");
+          let text = document.createTextNode(key);
+          th.appendChild(text);
+          row.appendChild(th);
+        }
+
+        for (let element of mountains) {
+          if(element["query_name"] === query && element["stream_name"] === stream) {
+          let row = table.insertRow();
+          for (key in element) {
+            let cell = row.insertCell();
+            let text = document.createTextNode(element[key]);
+            cell.appendChild(text);}
+          }
+        }
+    }
+  </script>
+  <body>
+    <p>Stream Data Base</p>
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+
+    <div align="center">
+      <label for="streamSelect">Choose stream: </label>
+      <select id="streamSelect" name="streamSelect" onchange="getQueries()">
+        <option disabled selected>Choose stream...</option>
+      </select>
+      <br />
+
+      <label for="querySelect">Choose query: </label>
+      <select id="querySelect" name="querySelect">
+        <option disabled selected>Choose query...</option>
+      </select>
+      <br />
+
+      <button
+        id="streamButton"
+        class="btn btn-primary btn-sm"
+        onclick="fetch_output()"
+      >
+        Submit
+      </button>
+      <br/>
+      <br/>
+      <button id="resultButton" class="btn btn-warning btn-sm" onclick="fetch_current_output()">
+        Check Current Result
+      </button>
+    </div>
+
+
+    <br />
+    <p id="demo"></p>
+
+    <div class="container text-center" id="outputContainer">
+      --- OUTPUT AREA ---
+      <table class="table table-bordered" id="outputTable"></table>
+    </div>
+  </body>
+  <script src="assets/js/readXML.js"></script>
+</html>
